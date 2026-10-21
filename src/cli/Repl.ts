@@ -1,7 +1,17 @@
 import * as readline from 'node:readline';
-import { HelpCommand } from './HelpCommand.js';
+import { SvgDocument } from '../document/SvgDocument.js';
+import { ShapeFactory } from '../shape/ShapeFactory.js';
+import { SvgSerializer } from '../io/SvgSerializer.js';
+import { SvgParser } from '../io/SvgParser.js';
+import { CommandDispatcher } from './CommandDispatcher.js';
 
 export class Repl {
+  private readonly doc = new SvgDocument();
+  private readonly factory = new ShapeFactory();
+  private readonly serializer = new SvgSerializer();
+  private readonly parser = new SvgParser();
+  private readonly dispatcher = new CommandDispatcher(this.doc, this.factory, this.serializer, this.parser);
+
   async run(): Promise<void> {
     const rl = readline.createInterface({
       input: process.stdin,
@@ -18,7 +28,8 @@ export class Repl {
         rl.prompt();
         return;
       }
-      this.handleLine(trimmed);
+      const result = this.dispatcher.dispatch(trimmed);
+      console.log(result.message);
       rl.prompt();
     });
 
@@ -27,15 +38,5 @@ export class Repl {
         resolve();
       });
     });
-  }
-
-  private handleLine(line: string): void {
-    const name = line.split(/\s+/)[0];
-    if (name === 'help') {
-      const result = new HelpCommand().execute();
-      console.log(result.message);
-      return;
-    }
-    console.log(`error: unknown command: ${name}`);
   }
 }
