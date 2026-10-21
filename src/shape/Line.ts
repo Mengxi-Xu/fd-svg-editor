@@ -81,6 +81,10 @@ export class Line extends LeafShape {
     return `${indent(ind)}<line id="${this.id}"${this.attrsToSvg()}/>`;
   }
 
+  override anchor(): { x: number; y: number } {
+    return { x: this.x1, y: this.y1 };
+  }
+
   describe(): string {
     return `line#${this.id} (${this.x1},${this.y1}) -> (${this.x2},${this.y2})${this.stroke !== undefined ? ` stroke=${this.stroke}` : ''}`;
   }

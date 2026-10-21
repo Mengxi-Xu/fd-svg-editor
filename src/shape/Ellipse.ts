@@ -79,6 +79,10 @@ export class Ellipse extends LeafShape {
     return `${indent(ind)}<ellipse id="${this.id}"${this.attrsToSvg()}/>`;
   }
 
+  override anchor(): { x: number; y: number } {
+    return { x: this.cx, y: this.cy };
+  }
+
   describe(): string {
     return `ellipse#${this.id} cx=${this.cx} cy=${this.cy} rx=${this.rx} ry=${this.ry}${this.fill !== undefined ? ` fill=${this.fill}` : ''}`;
   }

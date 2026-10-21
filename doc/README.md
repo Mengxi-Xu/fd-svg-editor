@@ -98,6 +98,20 @@ export interface Command {
 - **Command 接口引入 `category` 字段**：作业 4.3 要求文档类命令后禁止 undo/redo、显示类不入栈，用枚举显式表达三类命令的栈语义，避免在 Dispatcher 里用 `switch(kind)` 判断。
 - **REPL 提交 1 仅注册 `help`**：其余命令统一回 `error: unknown command`，保证骨架可启动、可编译，为提交 2 起的命令落地留出分发入口。
 
+### 提交 2：图形体系 + 文档命令 + create/tree/show
+
+- **Composite 落地**：`LeafShape` 基类统一处理公共属性 `fill/stroke/stroke-width`，子类只实现几何（`geomAttrs/moveGeom/scaleGeom/setGeom`）；`Group` 对 `move/scale` 递归到子节点。容器与叶子共享 `Shape` 接口，`getChildren/addChild/removeChild` 在叶子默认抛 `not a container`，`Group` 重写。
+- **IO 隔离**：`SvgParser` 手写递归下降解析器（标签栈 + 自闭合/嵌套同名标签计数），缺 id 元素按 `标签名+序号` 自动补并打印 `warning: assigned id ...`；`SvgSerializer` 调各 `Shape.toSvg` 生成标准 SVG。IO 不渗入领域。
+- **`create` 的 `in` 子句**：创建时即表达归属，对应作业"三种时机"中的"创建时归属"；`group`/`addto` 留给提交 3 处理事后收编与移动归属。
+
+### 提交 3：编辑命令族
+
+- **容器统一操作语义**：`move/scale` 对容器递归改子节点坐标（而非用 SVG `transform` 属性），序列化输出平铺的绝对坐标。这样 `tree`/`show` 看到的坐标即真实坐标，调试直观；代价是容器平移后子坐标被改写，但符合作业 4.1"作用于容器时递归到每个子孙"的明确要求。
+- **`group` 与 `in` 子句的时机划分**：`create ... in <c>`（创建时归属）、`group <g> <ids>`（事后收编已存在图形）、`addto <g> <id>`（移动归属）三者各司其职，命令层不混用。
+- **`SvgDocument` 细粒度 API**：新增 `detach/attachRoot/attachRootAt/registerId/unregisterId`，与原有递归 `register/unregister`（用于 create/delete 整棵子树）分离。`group/ungroup/addto/front/back` 只移动子树不改变 id 集合，用细粒度 API 避免误注销被移动图形的 id。
+- **`group` 含容器与其子孙的检查**：对每个待收编图形沿 `parent` 链向上，若链上遇到另一个待收编图形即报 `cannot group a container into its own descendant`，错误信息指向那个祖先容器 id（与作业示例 `group bad c1 markers → ...: markers` 一致）。
+- **`set` 的 undo 与属性清除**：记录旧值（`string | undefined`），undo 时若旧值为 `undefined` 调 `clearAttr` 移除属性（如原本无 `fill` 的图形被 `set fill` 后 undo），否则恢复旧值。几何属性必填不会走清除分支。
+
 ## 一致性自查
 
 （提交 5 完成。当前阶段：骨架与方案一致。）

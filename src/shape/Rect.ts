@@ -79,6 +79,10 @@ export class Rect extends LeafShape {
     return `${indent(ind)}<rect id="${this.id}"${this.attrsToSvg()}/>`;
   }
 
+  override anchor(): { x: number; y: number } {
+    return { x: this.x, y: this.y };
+  }
+
   describe(): string {
     return `rect#${this.id} x=${this.x} y=${this.y} w=${this.width} h=${this.height}${this.fill !== undefined ? ` fill=${this.fill}` : ''}`;
   }

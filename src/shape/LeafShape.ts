@@ -10,6 +10,7 @@ export abstract class LeafShape extends Shape {
   abstract scaleGeom(factor: number): void;
   abstract setGeom(attr: string, value: string): boolean;
   abstract getGeom(attr: string): string | undefined;
+  abstract override anchor(): { x: number; y: number };
 
   get isContainer(): boolean {
     return false;
@@ -49,6 +50,22 @@ export abstract class LeafShape extends Shape {
         return this.strokeWidth;
       default:
         return this.getGeom(attr);
+    }
+  }
+
+  clearAttr(attr: string): boolean {
+    switch (attr) {
+      case 'fill':
+        this.fill = undefined;
+        return true;
+      case 'stroke':
+        this.stroke = undefined;
+        return true;
+      case 'stroke-width':
+        this.strokeWidth = undefined;
+        return true;
+      default:
+        return false;
     }
   }
 

@@ -23,6 +23,8 @@ export abstract class Shape {
   abstract detail(): string[];
   abstract toSvg(indent: number): string;
   abstract describe(): string;
+  abstract anchor(): { x: number; y: number } | null;
+  abstract clearAttr(attr: string): boolean;
 
   getChildren(): readonly Shape[] {
     return [];
@@ -35,6 +37,17 @@ export abstract class Shape {
 
   removeChild(child: Shape): void {
     void child;
+    throw new Error(`not a container: ${this.id}`);
+  }
+
+  indexOfChild(child: Shape): number {
+    void child;
+    throw new Error(`not a container: ${this.id}`);
+  }
+
+  insertChildAt(child: Shape, index: number): void {
+    void child;
+    void index;
     throw new Error(`not a container: ${this.id}`);
   }
 }

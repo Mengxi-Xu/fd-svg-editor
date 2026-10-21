@@ -71,6 +71,10 @@ export class Circle extends LeafShape {
     return `${indent(ind)}<circle id="${this.id}"${this.attrsToSvg()}/>`;
   }
 
+  override anchor(): { x: number; y: number } {
+    return { x: this.cx, y: this.cy };
+  }
+
   describe(): string {
     return `circle#${this.id} cx=${this.cx} cy=${this.cy} r=${this.r}${this.fill !== undefined ? ` fill=${this.fill}` : ''}`;
   }

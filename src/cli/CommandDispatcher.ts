@@ -11,6 +11,15 @@ import { SaveCommand } from '../command/SaveCommand.js';
 import { CreateCommand } from '../command/CreateCommand.js';
 import { TreeCommand } from '../command/TreeCommand.js';
 import { ShowCommand } from '../command/ShowCommand.js';
+import { MoveCommand } from '../command/MoveCommand.js';
+import { ScaleCommand } from '../command/ScaleCommand.js';
+import { SetCommand } from '../command/SetCommand.js';
+import { DeleteCommand } from '../command/DeleteCommand.js';
+import { GroupCommand } from '../command/GroupCommand.js';
+import { UngroupCommand } from '../command/UngroupCommand.js';
+import { AddToCommand } from '../command/AddToCommand.js';
+import { FrontCommand } from '../command/FrontCommand.js';
+import { BackCommand } from '../command/BackCommand.js';
 
 export class CommandDispatcher {
   constructor(
@@ -42,6 +51,24 @@ export class CommandDispatcher {
         return new TreeCommand(this.doc, args).execute();
       case 'show':
         return new ShowCommand(this.doc, args).execute();
+      case 'move':
+        return new MoveCommand(this.doc, args).execute();
+      case 'scale':
+        return new ScaleCommand(this.doc, args).execute();
+      case 'set':
+        return new SetCommand(this.doc, args).execute();
+      case 'delete':
+        return new DeleteCommand(this.doc, args).execute();
+      case 'group':
+        return new GroupCommand(this.doc, args).execute();
+      case 'ungroup':
+        return new UngroupCommand(this.doc, args).execute();
+      case 'addto':
+        return new AddToCommand(this.doc, args).execute();
+      case 'front':
+        return new FrontCommand(this.doc, args).execute();
+      case 'back':
+        return new BackCommand(this.doc, args).execute();
       default:
         return fail(`unknown command: ${name}`);
     }

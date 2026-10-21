@@ -36,11 +36,11 @@ export class Group extends Shape {
     }
   }
 
-  indexOfChild(child: Shape): number {
+  override indexOfChild(child: Shape): number {
     return this.kids.indexOf(child);
   }
 
-  insertChildAt(child: Shape, index: number): void {
+  override insertChildAt(child: Shape, index: number): void {
     child.parent = this;
     this.kids.splice(index, 0, child);
   }
@@ -109,5 +109,25 @@ export class Group extends Shape {
 
   describe(): string {
     return `g#${this.id}`;
+  }
+
+  anchor(): null {
+    return null;
+  }
+
+  clearAttr(attr: string): boolean {
+    switch (attr) {
+      case 'fill':
+        this.fill = undefined;
+        return true;
+      case 'stroke':
+        this.stroke = undefined;
+        return true;
+      case 'stroke-width':
+        this.strokeWidth = undefined;
+        return true;
+      default:
+        return false;
+    }
   }
 }

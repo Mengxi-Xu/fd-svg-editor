@@ -96,6 +96,32 @@ export class SvgDocument {
     this.register(shape);
   }
 
+  detach(shape: Shape): void {
+    if (shape.parent !== null) shape.parent.removeChild(shape);
+    else {
+      const i = this.roots.indexOf(shape);
+      if (i >= 0) this.roots.splice(i, 1);
+    }
+  }
+
+  attachRoot(shape: Shape): void {
+    shape.parent = null;
+    this.roots.push(shape);
+  }
+
+  attachRootAt(shape: Shape, index: number): void {
+    shape.parent = null;
+    this.roots.splice(index, 0, shape);
+  }
+
+  registerId(shape: Shape): void {
+    this.ids.set(shape.id, shape);
+  }
+
+  unregisterId(shape: Shape): void {
+    this.ids.delete(shape.id);
+  }
+
   allShapes(): Shape[] {
     const out: Shape[] = [];
     const walk = (s: Shape): void => {

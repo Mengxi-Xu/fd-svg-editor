@@ -84,6 +84,10 @@ export class Text extends LeafShape {
     return `${indent(ind)}<text id="${this.id}"${this.attrsToSvg()}>${this.content}</text>`;
   }
 
+  override anchor(): { x: number; y: number } {
+    return { x: this.x, y: this.y };
+  }
+
   describe(): string {
     return `text#${this.id} (${this.x},${this.y}) "${this.content}"`;
   }
