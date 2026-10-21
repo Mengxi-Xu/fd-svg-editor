@@ -21,8 +21,6 @@ import { UngroupCommand } from '../command/UngroupCommand.js';
 import { AddToCommand } from '../command/AddToCommand.js';
 import { FrontCommand } from '../command/FrontCommand.js';
 import { BackCommand } from '../command/BackCommand.js';
-import { UndoCommand } from '../command/UndoCommand.js';
-import { RedoCommand } from '../command/RedoCommand.js';
 
 export class CommandDispatcher {
   constructor(
@@ -38,8 +36,8 @@ export class CommandDispatcher {
     if (parts.length === 0) return fail('empty command');
     const name = parts[0];
     const args = parts.slice(1);
-    if (name === 'undo') return new UndoCommand(this.doc, this.history).execute();
-    if (name === 'redo') return new RedoCommand(this.doc, this.history).execute();
+    if (name === 'undo') return this.handleUndo();
+    if (name === 'redo') return this.handleRedo();
     const cmd = this.build(name, args);
     if (cmd === null) return fail(`unknown command: ${name}`);
     const result = cmd.execute();
@@ -56,6 +54,22 @@ export class CommandDispatcher {
         break;
     }
     return result;
+  }
+
+  private handleUndo(): CommandResult {
+    if (!this.doc.isLoaded()) return fail("no document. use 'init' or 'read' first");
+    if (this.history.isFrozen()) return fail('undo not allowed after io command');
+    const cmd = this.history.popForUndo();
+    if (cmd === null) return fail('nothing to undo');
+    return cmd.undo();
+  }
+
+  private handleRedo(): CommandResult {
+    if (!this.doc.isLoaded()) return fail("no document. use 'init' or 'read' first");
+    if (this.history.isFrozen()) return fail('redo not allowed after io command');
+    const cmd = this.history.popForRedo();
+    if (cmd === null) return fail('nothing to redo');
+    return cmd.redo();
   }
 
   private build(name: string, args: string[]): Command | null {
