@@ -3,12 +3,14 @@ import { SvgDocument } from '../document/SvgDocument.js';
 
 export class CanvasCommand implements Command {
   readonly kind = 'canvas';
-  readonly category = CommandCategory.Document;
+  readonly category: CommandCategory;
 
   constructor(
     private readonly doc: SvgDocument,
     private readonly args: string[],
-  ) {}
+  ) {
+    this.category = this.args.length === 0 ? CommandCategory.Display : CommandCategory.Document;
+  }
 
   execute(): CommandResult {
     if (!this.doc.isLoaded()) return fail("no document. use 'init' or 'read' first");

@@ -3,6 +3,7 @@ import { SvgDocument } from '../document/SvgDocument.js';
 import { ShapeFactory } from '../shape/ShapeFactory.js';
 import { SvgSerializer } from '../io/SvgSerializer.js';
 import { SvgParser } from '../io/SvgParser.js';
+import { CommandHistory } from '../history/CommandHistory.js';
 import { CommandDispatcher } from './CommandDispatcher.js';
 
 export class Repl {
@@ -10,7 +11,8 @@ export class Repl {
   private readonly factory = new ShapeFactory();
   private readonly serializer = new SvgSerializer();
   private readonly parser = new SvgParser();
-  private readonly dispatcher = new CommandDispatcher(this.doc, this.factory, this.serializer, this.parser);
+  private readonly history = new CommandHistory();
+  private readonly dispatcher = new CommandDispatcher(this.doc, this.factory, this.serializer, this.parser, this.history);
 
   async run(): Promise<void> {
     const rl = readline.createInterface({

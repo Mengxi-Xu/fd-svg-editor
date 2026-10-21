@@ -112,6 +112,14 @@ export interface Command {
 - **`group` 含容器与其子孙的检查**：对每个待收编图形沿 `parent` 链向上，若链上遇到另一个待收编图形即报 `cannot group a container into its own descendant`，错误信息指向那个祖先容器 id（与作业示例 `group bad c1 markers → ...: markers` 一致）。
 - **`set` 的 undo 与属性清除**：记录旧值（`string | undefined`），undo 时若旧值为 `undefined` 调 `clearAttr` 移除属性（如原本无 `fill` 的图形被 `set fill` 后 undo），否则恢复旧值。几何属性必填不会走清除分支。
 
+### 提交 4：undo/redo 历史栈
+
+- **`CommandHistory` 双栈 + frozen**：`undoStack`/`redoStack` + `frozen` 标志。`push`（编辑命令）入 undo 栈、**清空 redo 栈**、解冻；`onReset`（init/read）清两栈并冻结（文档已变，旧编辑无意义）；`onIo`（save / canvas 改尺寸）仅冻结不清栈（文档内容未变，只是暂时禁止 undo）。
+- **粒度落地**：一条编辑命令 = 一个 undo 单元；文档类命令后 `frozen=true`，`undo`/`redo` 报 `undo not allowed after io command`，下一次编辑命令 `push` 解冻。`canvas` 无参数是纯查询（构造时 `category=Display`），不冻结、不入栈。
+- **`UndoCommand`/`RedoCommand` 为元命令**：`category=Display` 自身不入栈，`execute` 从 history 取出目标命令并转发其 `undo()`/`redo()` 结果，故 REPL 输出的就是被撤销命令的反馈（如 `circle#c1 moved back to (100,100)`）。
+- **Dispatcher 按 category 编排历史**：`Edit` → push；`Document` → onReset/onIo；`Display` → 跳过。**失败命令（`result.ok=false`）不触碰历史**，保证"命令失败不改变任何状态"延伸到历史层。
+- **redo 栈清空时机**：作业 4.3"undo 后若有新编辑，redo 栈清空"由 `push` 中 `redoStack.length = 0` 实现，已用 `undo → create → redo(nothing to redo)` 验证。
+
 ## 一致性自查
 
 （提交 5 完成。当前阶段：骨架与方案一致。）
